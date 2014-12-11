@@ -6,7 +6,7 @@
 	 * Time: 12:03 PM
 	 */
 
-	define('GOOGLE_API_KEY', 'AIzaSyDjrbUgW82pgXE589Fc_yxSqZpqKB610Vo');
+	include("settings.php");
 
 	$db = new SQLite3('db.sqlite');
 	try {
