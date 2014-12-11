@@ -20,16 +20,24 @@
 				                'description' => $row['description']];
 			}
 		} else {
-			$locations[] = ["name"        => "There was an error with the database",
+			/*
+			 * Check for errors. Set the message to show on the buildings dropdown
+			 */
+			$locations[] = ["name"        => "We're sorry. There was an error processing your request",
 			                'latitude'    => null,
 			                'longitude'   => null,
 			                'description' => null];
+			$locations = null;
 		}
 	} catch (Exception $e) {
-		$locations[] = ["name"        => "There was an error with the database",
+		/*
+		 * Check for errors. Set the message to show on the buildings dropdown
+		 */
+		$locations[] = ["name"        => "We're sorry. There was an error processing your request",
 		                'latitude'    => null,
 		                'longitude'   => null,
 		                'description' => null];
+		$locations = null;
 	}
 
 
@@ -54,29 +62,50 @@
 	<nav class="navbar nav-bar-fixed-top" role="navigation">
 		<a class="navbar-brand" href="#">EKU Building Locator</a>
 	</nav>
-	<div id="map-canvas" style="width: 100%; height: 300px;"></div>
-	<!--<label>
-		Place name
-		<input class="form-control" type="text"/>
-	</label>
-	<button class="btn btn-default" onclick="savePosition()" type="button">Save my position!</button>-->
-	<label for="buildingDropdown">
-		Pick a building:
-		<select class="form-control" name="buildingDropdown" id="buildingDropdown">
-			<?
-				foreach($locations as $location){
-					$latitude = $location['latitude'];
-					$longitude = $location['longitude'];
-					$name = $location['name'];
-					?>
-					<option value="<?= $latitude; ?>,<?= $longitude; ?>"><?= $name; ?></option>
-				<?
-				}
+	<?
+		/*
+		 * Check for the error condition that the database done blown up. If it hasn't, it's business as usual
+		 */
+		if (!is_null($locations)) {
 			?>
-		</select>
-	</label>
-	<button class="btn btn-default" type="button" id="goToBuildingButton">Go to building</button>
-	<button class="btn btn-default" type="button" id="openInMapsButton" onclick="openInGMaps()" disabled>Open in Google Maps</button>
+			<!-- The world as we know it -->
+			<div id="map-canvas" style="width: 100%; height: 300px;"></div>
+			<!-- The end of the world as we know it -->
+
+			<label for="buildingDropdown">
+				Pick a building:
+				<select class="form-control" name="buildingDropdown" id="buildingDropdown">
+					<?
+						/*
+						 * Populate the dropdown with the building names and their coordinates in lat,long format.
+						 * They will be broken up later by javascript
+						 */
+						foreach ($locations as $location) {
+							$latitude = $location['latitude'];
+							$longitude = $location['longitude'];
+							$name = $location['name'];
+							?>
+							<option value="<?= $latitude; ?>,<?= $longitude; ?>"><?= $name; ?></option>
+						<?
+						}
+					?>
+				</select>
+			</label>
+			<button class="btn btn-default" type="button" id="goToBuildingButton">Go to building</button>
+			<button class="btn btn-default" type="button" id="openInMapsButton" onclick="openInGMaps()" disabled>Open in
+				Google
+				Maps
+			</button>
+			<?
+			/*
+			 * Otherwise throw up a big huge fat error
+			 */
+		} else {
+			?>
+			<div class="alert alert-error">We're sorry. There was an error processing your request. Please try again later</div>
+		<?
+		}
+	?>
 </div>
 </body>
 <!-- load the map functions after everything to ensure proper functionality -->
